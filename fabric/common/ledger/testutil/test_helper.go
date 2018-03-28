@@ -4,6 +4,8 @@ import (
 	"testing"
 	"github.com/hyperledger2/fabric/protos/common"
 	pb "github.com/hyperledger2/fabric/protos/peer"
+	ptestutils "github.com/hyperledger2/fabric/protos/testutils"
+	"github.com/hyperledger/fabric/common/util"
 )
 
 // ConstructBlock constructs a single block
@@ -29,7 +31,7 @@ func ConstructTestBlock(t *testing.T, blockNum uint64, numTx int, txSize int) *c
 }
 
 //ConstructTransaction constructs a transaction for testing
-func ConstructTransaction(_ *testing.T, simulationResult []byte, txid string, sign bool) (*common.Envelope, string, error) {
+func ConstructTransaction(_ *testing.T, simulationResults []byte, txid string, sign bool) (*common.Envelope, string, error) {
 	ccid := &pb.ChaincodeID{
 		Name:    "foo",
 		Version: "v1",
@@ -38,6 +40,9 @@ func ConstructTransaction(_ *testing.T, simulationResult []byte, txid string, si
 	var txEnv *common.Envelope
 	var err error
 	if sign {
-
+		txEnv, txID, err = ptestutils.ConstructSingedTxEnvWithDefaultSigner(util.GetTestChainID(), ccid, nil, simulationResults, txid, nil, nil)
+	} else {
+		txEnv, txID, err = ptestutils.ConstructUnsignedTxEnv(util.GetTestChainID(), ccid, nil, simulationResults, txid, nil, nil)
 	}
+	return txEnv, txID, err
 }
